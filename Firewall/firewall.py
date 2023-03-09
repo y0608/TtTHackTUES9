@@ -1,4 +1,5 @@
 import mysql.connector
+import csv
 
 db_user = ''
 db_password = ''
@@ -8,6 +9,24 @@ tdb_database = ''
 
 wldb_host = ''
 wldb_database = ''
+
+def csv_create(input):
+    # create a csv file for the ML training
+    pass
+
+    # data
+    mydict =[{'Name': 'Ash Ketchum', 'SNo': '1', 'Subject': 'English'}, 
+            {'Name': 'Gary Oak', 'SNo': '2', 'Subject': 'Mathematics'}, 
+            {'Name': 'Brock Lesner', 'SNo': '3', 'Subject': 'Physics'}]
+
+    # field names 
+    fields = ['SNo', 'Name', 'Subject'] 
+
+    with open('students.csv', 'w', newline='') as file: 
+        writer = csv.DictWriter(file, fieldnames = fields)
+
+        writer.writeheader() 
+        writer.writerows(mydict)
 
 def get_source_and_destination(input):
     pass
