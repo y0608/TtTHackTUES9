@@ -28,7 +28,8 @@
             {% for whitelistip in device.whitelist_set.all %}
                 <li style="margin: 10px 0">
                     {{whitelistip}}
-                    <button type="submit" class="btn btn-dark btn-sm", name="moveToBlacklist", value="save">Move to blacklist</button>
+                    <button type="submit" class="btn btn-dark btn-sm", name="whiteToBlacklist", value="{{whitelistip.id}}">Move to blacklist</button>
+                    <button type="submit" class="btn btn-danger btn-sm", name="removeFromWhiteList", value="{{whitelistip.id}}">Delete</button>
                 </li>
             {% endfor %}
         </ul>
@@ -43,14 +44,15 @@
         {% csrf_token %}
         <ul>
             {% for blacklistip in device.blacklist_set.all %}
-            <li style="margin: 10px 0">
-                {{blacklistip}}
-                <button type="submit" class="btn btn-info btn-sm", name="moveToWhitelist", value="{{IDIDIDIDIDIDIDIDIDIDIIDDIIDDI}}">Move to whitelist</button>
-            </li>
+                <li style="margin: 10px 0">
+                    {{blacklistip}}
+                    <button type="submit" class="btn btn-info btn-sm", name="blackToWhitelist", value="{{blacklistip.id}}">Move to whitelist</button>
+                    <button type="submit" class="btn btn-danger btn-sm", name="removeFromBlackList", value="{{blacklistip.id}}">Delete</button>
+                </li>
             {% endfor %}
         </ul>
-            <input type="text", name="new">
-            <button type="submit", name="newItemBlacklist", value="save">Add ip</button>
+        <input type="text", name="new">
+        <button type="submit", name="newItemBlacklist", value="save">Add ip</button>
     </form>
 
 

@@ -26,20 +26,37 @@ def index(response,id):
             else:
                 print("invalid")
                       
-        elif response.POST.get("moveToWhitelist"):
-            pass
-            # print("AAAAAAAAA" + response.POST.get("moveToWhitelist"))
-            # id = ...
-            # tempip = 
-            # device.blacklist_set.all()[id].delete()
-            # device.blacklist_set.create(ip=tempip)
+        elif response.POST.get("whiteToBlacklist"):            
+            id = int(response.POST.get("whiteToBlacklist"))
+            currentDevice = device.whitelist_set.all().filter(id=id)
+            tempip = currentDevice[0].ip
+            currentDevice.delete()
+            device.blacklist_set.create(ip=tempip)
+        elif response.POST.get("blackToWhitelist"):
+            id = int(response.POST.get("blackToWhitelist"))
+            currentDevice = device.blacklist_set.all().filter(id=id)
+            tempip = currentDevice[0].ip
+            currentDevice.delete()
+            device.whitelist_set.create(ip=tempip)
+            
+        # elif response.POST.get("removeFromBlackList"):
+        #     print("remove from blacklist")
+        #     id = int(response.POST.get("removeFromBlackList"))
+        #     currentDevice = device.blacklist_set.all().filter(id=id)
+        #     currentDevice.delete()
+        elif response.POST.get("removeFromWhiteList"):
+            print("remove from whitelist")
+            id = int(response.POST.get("removeFromWhiteList"))
+            currentDevice = device.whitelist_set.all().filter(id=id)
+            currentDevice.delete()
+            
+        elif response.POST.get("removeFromBlackList"):
+            print("removeFromBlackList")
+            id = int(response.POST.get("removeFromBlackList"))
+            currentDevice = device.blacklist_set.all().filter(id=id)
+            currentDevice.delete()
+            
 
-        elif response.POST.get("moveToBlacklist"):
-            pass
-            # id = ...
-            # tempip = 
-            # device.blacklist_set.all()[id].delete()# delete from whitelist
-            # device.blacklist_set.create(ip=tempip)# add to blacklist
                               
     return render(response,"main/list.html",{"device":device})
 
