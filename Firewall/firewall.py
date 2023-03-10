@@ -196,29 +196,25 @@ def Internet_to_IoT(source, destination):
 
         ##DATABASE##    
 ##############################
-#starts=load_file('mac_addresses.txt')
-#rint(starts)
-#records=get_valid_ips("192.12.24.2")
-IoT_to_Internet("123.123.213.23","lllllll2")
-#blacklist_ip("123.123.213.23","452.")
-# capture = pyshark.LiveCapture(interface='wlan0')
-# capture.sniff(timeout=10)
-# print("aaa")
-
-# for packet in capture:
-#     if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and cmp_mac_address_start(packet.eth.src,starts):
-#         print(packet)
-#         row = make_dict(packet)
-#         #source, destination = get_source_and_destination(row)
-#         if row is None:
-#             pass
-#         #source = row['src_addr']
-#         #destination = row['dst_addr']
-#         #IoT_to_Internet(source, destination)
-#         #Internet_to_IoT(source, destination)
-#         csv_create(row)
+starts=load_file('mac_addresses.txt')
+capture = pyshark.LiveCapture(interface='wlan0')
+capture.sniff(timeout=10)
+print("aaa")
+for packet in capture:
+    src = cmp_mac_address_start(packet.eth.src,starts)
+    dst = cmp_mac_address_start(packet.eth.dst,starts)
+    if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and (src or dst):
+        row = make_dict(packet)
+        if row is None:
+            pass
+        source = row['src_addr']
+        destination = row['dst_addr']
+        if src:
+            IoT_to_Internet(source, destination)
+        if dst:
+            Internet_to_IoT(source, destination)
+        csv_create(row)
 
 ############################byuaykowxvwoepil
-
 
 
