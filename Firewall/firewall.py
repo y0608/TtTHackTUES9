@@ -70,24 +70,25 @@ def csv_create(input):
 
 connection = sqlite3.connect('mydb.db')
 
-def get_invalid_ips(mac):
+def get_invalid_ips(ip):
     # get ips from the blacklist database
-    pass
-    #connection = sqlite3.connect('mydb.db')
-    sql_select_Query = "select * from white_list"
+    connection = sqlite3.connect('db.sqlite3')
+    sql_select_Query = "SELECT main_blacklist.ip FROM main_blacklist LEFT JOIN main_iotdevice ON main_blacklist.device_id=main_iotdevice.id WHERE main_iotdevice.ip=?"
     cursor = connection.cursor()
-    cursor.execute(sql_select_Query)
+    cursor.execute(sql_select_Query, (ip,))
     records = cursor.fetchall()
+    connection.close()
     return records
 
 
 def get_valid_ips(ip):
     # get ips from the whitelist database
-    pass
-    sql_select_Query = "select * from black_list"
+    connection = sqlite3.connect('db.sqlite3')
+    sql_select_Query = "SELECT main_whitelist.ip FROM main_whitelist LEFT JOIN main_iotdevice ON main_whitelist.device_id=main_iotdevice.id WHERE main_iotdevice.ip=?"
     cursor = connection.cursor()
-    cursor.execute(sql_select_Query)
+    cursor.execute(sql_select_Query, (ip,))
     records = cursor.fetchall()
+    connection.close()
     return records
 
 def block_ip(ip):
@@ -95,9 +96,38 @@ def block_ip(ip):
     blacklist_ip(ip)
     pass 
 
-def blacklist_ip(ip):
+def whitelist_ip(ip,add_ip):
     # add ip to the blacklist database
-    pass
+    connection = sqlite3.connect('db.sqlite3')
+    sql_select_Query = "select main_iotdevice.id from main_iotdevice where main_iotdevice.ip==?"
+    cursor = connection.cursor()
+    cursor.execute(sql_select_Query, (ip,))
+    device_id = cursor.fetchone()
+    sql_insert_Query = "insert into main_whitelist(ip,device_id)values(?,?)"
+    if device_id:
+        cursor.execute(sql_insert_Query,(add_ip,device_id[0]))
+        connection.commit()
+    connection.close()
+
+def blacklist_ip(ip,blocked_ip):
+    # add ip to the blacklist database
+    connection = sqlite3.connect('db.sqlite3')
+    sql_select_Query = "select main_iotdevice.id from main_iotdevice where main_iotdevice.ip==?"
+    cursor = connection.cursor()
+    cursor.execute(sql_select_Query, (ip,))
+    device_id = cursor.fetchone()
+    sql_select_Query = "select main_whitelist.id from main_whitelist left join main_iotdevice on main_whitelist.device_id==main_iotdevice.id where main_iotdevice.ip==? and main_whitelist.ip==?"
+    cursor.execute(sql_select_Query,(ip,blocked_ip))
+    whitelist_ip= cursor.fetchone()
+    if whitelist_ip:
+        sql_delete_Query = "delete from main_whitelist where main_whitelist.id==?"
+        cursor.execute(sql_delete_Query,(whitelist_ip[0],))
+        connection.commit()
+    sql_insert_Query = "insert into main_blacklist(ip,device_id)values(?,?)"
+    if device_id:
+        cursor.execute(sql_insert_Query,(blocked_ip,device_id[0]))
+        connection.commit()
+    connection.close()
 
 def IoT_to_Internet(source, destination):
     valid_ips = get_valid_ips(source)
@@ -111,30 +141,39 @@ def IoT_to_Internet(source, destination):
         return
 
 def Internet_to_IoT(source, destination):
-    pass
+    valid_ips = get_valid_ips(destination)
+
+    if 2 > valid_ips.len():
+        whitelist_ip(source)
+        return
+
+    if 1 > valid_ips.count(source):
+        block_ip(source)
+        return
 
 
         ##DATABASE##    
 ##############################
-starts=load_file('mac_addresses.txt')
-print(starts)
+#starts=load_file('mac_addresses.txt')
+#rint(starts)
+#records=get_valid_ips("192.12.24.2")
+blacklist_ip("123.123.213.23","452.")
+# capture = pyshark.LiveCapture(interface='wlan0')
+# capture.sniff(timeout=10)
+# print("aaa")
 
-capture = pyshark.LiveCapture(interface='wlan0')
-capture.sniff(timeout=10)
-print("aaa")
-
-for packet in capture:
-    if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and cmp_mac_address_start(packet.eth.src,starts):
-        print(packet)
-        row = make_dict(packet)
-        #source, destination = get_source_and_destination(row)
-        if row is None:
-            pass
-        #source = row['src_addr']
-        #destination = row['dst_addr']
-        #IoT_to_Internet(source, destination)
-        #Internet_to_IoT(source, destination)
-        csv_create(row)
+# for packet in capture:
+#     if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and cmp_mac_address_start(packet.eth.src,starts):
+#         print(packet)
+#         row = make_dict(packet)
+#         #source, destination = get_source_and_destination(row)
+#         if row is None:
+#             pass
+#         #source = row['src_addr']
+#         #destination = row['dst_addr']
+#         #IoT_to_Internet(source, destination)
+#         #Internet_to_IoT(source, destination)
+#         csv_create(row)
 
 ############################
 
