@@ -154,7 +154,7 @@ print("aaa")
 strarts=load_file('file.txt')
 for packet in capture:
     try:
-        if cmp_mac_address_start(packet.eth.src,strarts)==False:
+        if cmp_mac_address_start(packet.eth.src,starts)==False:
             pass
     except AttributeError as e:
         pass
