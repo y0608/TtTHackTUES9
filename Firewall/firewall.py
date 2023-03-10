@@ -41,8 +41,6 @@ mail_server.connect("smtp.gmail.com", port)
 mail_server.ehlo()
 mail_server.login("hacktues9TtT@gmail.com", password)
 
-    
-
 
 def load_file(file_name):
     starts = []

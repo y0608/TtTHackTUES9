@@ -18,9 +18,12 @@
     <br><br>
     
     <ul>
-        {% for device in devices %}
-            <!-- <li>{{device.name}}</li> -->
-            <h2><a href="/{{device.id}}">{{device.name}}</a></h2>
-        {% endfor %}
+        <form method="post" action="#">
+            {% csrf_token %}
+            {% for device in devices %}
+                <!-- <li>{{device.name}}</li> -->
+                <h2><a href="/{{device.id}}">{{device.mac}}</a> <button type="submit" class="btn btn-danger btn-sm", name="removeDevice", value="{{device.id}}">Delete</button></h2>
+            {% endfor %}
+        </form>
     </ul>
 {% endblock %}
