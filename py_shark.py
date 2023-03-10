@@ -33,7 +33,6 @@ def get_all_mac_addresses():
             if mac_addr not in mac_address and cmp_mac_address_start(mac_addr, starts):
                 mac_address.append(mac_addr)    
                 print("new mac address added: ", mac_addr)
-                print(packet.ip.dst) 
                 with open("mac_addresses.txt", 'a') as f:
                     f.write(mac_addr + '\n') #add the new mac address in the text file ( not to be added again )
             
