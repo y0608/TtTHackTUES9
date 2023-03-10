@@ -22,7 +22,7 @@ def cmp_mac_address_start(curr_mac_address, starts):
 def get_all_mac_addresses():
     capture = pyshark.LiveCapture(interface = 'wlp2s0')
     capture.sniff(timeout = 10)
-    starts = load_file("esp2.txt") #load the starts of mac addresses we want to track
+    starts = load_file("iot_devices_mac_addresses.txt") #load the starts of mac addresses we want to track
     mac_address = load_file("mac_addresses.txt") #load mac addresses we already added in the data base( no need to be added again )
     timer = 400 #how many iterations before program breaks
 
