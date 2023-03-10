@@ -13,8 +13,6 @@ tdb_database = ''
 wldb_host = ''
 wldb_database = ''
 
-networkInterface = "wlp3s0"
-
 def load_file(file_name):
     starts = []
     with open(file_name, 'r') as file:
@@ -26,7 +24,6 @@ def load_file(file_name):
 def cmp_mac_address_start(curr_mac_address, starts):
     for start in starts:
         if curr_mac_address == start:
-            print("in11212")
             return True
     return False
 
@@ -36,14 +33,19 @@ def make_dict(packet):
     try:
         time = datetime.datetime.now()
         packet_info['localtime'] = time.year*10000000000 + time.month * 100000000 + time.day * 1000000 + time.hour*10000 + time.minute*100 + time.second
-        packet_info['src_port']  = int(packet[packet.transport_layer].srcport)   # source port
+        packet_info['src_port']  = 1                                              # source port
         packet_info['src_mac']   = int(packet.eth.src.replace(':',''),16)         # source mac
-        packet_info['dst_port']  = int(packet[packet.transport_layer].dstport)   # destination port
+        packet_info['dst_port']  = 1                                              # destination port
         packet_info['dst_mac']   = int(packet.eth.dst.replace(':',''),16)         # destination mac
         packet_info['size']      = len(packet)                                    # length of the packet
         packet_info['malicious'] = 0
-    
+        
+        if 'TCP' in packet or 'UDP' in packet:
+            packet_info['src_port']  = int(packet[packet.transport_layer].srcport)   # source port
+            packet_info['dst_port']  = int(packet[packet.transport_layer].dstport)   # destination port
+
         if 'IP' in packet:
+            print("asdf")
             packet_info['dst_addr']  = int(packet.ip.dst.replace('.',''))             # destination address
             packet_info['src_addr']  = int(packet.ip.src.replace('.',''))             # source address
         if 'IPv6' in packet:
@@ -63,7 +65,7 @@ def csv_create(input):
     with open('traffic.csv', 'a', newline='') as file: 
         writer = csv.DictWriter(file, fieldnames = fields)
         if os.path.getsize('traffic.csv')==0:
-            writer.writeheader() 
+            writer.writeheader()
         writer.writerow(input)
 
 connection = sqlite3.connect('mydb.db')
@@ -117,23 +119,22 @@ def Internet_to_IoT(source, destination):
 starts=load_file('mac_addresses.txt')
 print(starts)
 
-capture = pyshark.LiveCapture(interface='wlp2s0')
+capture = pyshark.LiveCapture(interface='wlan0')
 capture.sniff(timeout=10)
 print("aaa")
 
 for packet in capture:
     if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and cmp_mac_address_start(packet.eth.src,starts):
         print(packet)
-    
-    #row = make_dict(packet)
-    #source, destination = get_source_and_destination(row)
-    #print(row)
-    #if row is None:
-     #   pass
-    #source = row['src_addr']
-    #destination = row['dst_addr']
-    #IoT_to_Internet(source, destination)
-    #Internet_to_IoT(source, destination)
-    #csv_create(row)
+        row = make_dict(packet)
+        #source, destination = get_source_and_destination(row)
+        if row is None:
+            pass
+        #source = row['src_addr']
+        #destination = row['dst_addr']
+        #IoT_to_Internet(source, destination)
+        #Internet_to_IoT(source, destination)
+        csv_create(row)
 
 ############################
+
