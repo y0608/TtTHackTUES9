@@ -3,15 +3,46 @@ import datetime
 import sqlite3
 import csv
 import os
+import smtplib
+import ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
 
-db_user = ''
-db_password = ''
 
-tdb_host = ''
-tdb_database = ''
+def send_mail(src_ip, dst_ip):
 
-wldb_host = ''
-wldb_database = ''
+    receiver_list = ['victorhandzhiev@gmail.com']
+    body = """
+    Source IP(blocked): {}
+
+    Destination IP: {}
+
+
+    """.format(src_ip, dst_ip)
+    for receiver in receiver_list:
+        msg = MIMEMultipart()
+        msg['From'] = 'IoT Firewall'
+        msg['To'] = receiver
+        msg['Subject'] = 'New security issue detected!'
+
+        msg.attach(MIMEText('{}'.format(body), 'plain', 'utf-8'))
+
+        text = msg.as_string()
+        mail_server.sendmail("hacktues9TtT@gmail.com", receiver, text)
+
+# SMTP setup
+port = 465  # For SSL
+# password = getpass(prompt="Type your password and press enter: ", stream=None)
+password = "byuaykowxvwoepil"
+context = ssl.create_default_context()
+mail_server = smtplib.SMTP_SSL("smtp.gmail.com", port, context=context)
+mail_server.connect("smtp.gmail.com", port)
+mail_server.ehlo()
+mail_server.login("hacktues9TtT@gmail.com", password)
+
+    
+
 
 def load_file(file_name):
     starts = []
@@ -93,7 +124,7 @@ def get_valid_ips(ip):
 
 def block_ip(ip):
     # remove from whitelist database if exists in future
-    blacklist_ip(ip)
+    
     pass 
 
 def whitelist_ip(ip,add_ip):
@@ -127,28 +158,41 @@ def blacklist_ip(ip,blocked_ip):
     if device_id:
         cursor.execute(sql_insert_Query,(blocked_ip,device_id[0]))
         connection.commit()
+        block_ip(blocked_ip)
     connection.close()
 
 def IoT_to_Internet(source, destination):
     valid_ips = get_valid_ips(source)
-
-    if 2 > valid_ips.len():
+    invalid_ips = get_invalid_ips(source)
+    for i in invalid_ips:
+        if destination in i:
+            return
+        
+    if 2 > len(valid_ips):
         whitelist_ip(destination)
         return
 
     if 1 > valid_ips.count(destination):
-        block_ip(source)
+        send_mail(source, destination)
+        mail_server.quit()
+        #blacklist_ip(source,destination)
         return
 
 def Internet_to_IoT(source, destination):
     valid_ips = get_valid_ips(destination)
-
-    if 2 > valid_ips.len():
+    invalid_ips = get_invalid_ips(destination)
+    for i in invalid_ips:
+        if source in i:
+            return
+        
+    if 2 > len(valid_ips):
         whitelist_ip(source)
         return
-
+    
     if 1 > valid_ips.count(source):
-        block_ip(source)
+        send_mail(source, destination)
+        mail_server.quit()
+        blacklist_ip(destination,source)
         return
 
 
@@ -157,7 +201,8 @@ def Internet_to_IoT(source, destination):
 #starts=load_file('mac_addresses.txt')
 #rint(starts)
 #records=get_valid_ips("192.12.24.2")
-blacklist_ip("123.123.213.23","452.")
+IoT_to_Internet("123.123.213.23","lllllll2")
+#blacklist_ip("123.123.213.23","452.")
 # capture = pyshark.LiveCapture(interface='wlan0')
 # capture.sniff(timeout=10)
 # print("aaa")
@@ -175,5 +220,7 @@ blacklist_ip("123.123.213.23","452.")
 #         #Internet_to_IoT(source, destination)
 #         csv_create(row)
 
-############################
+############################byuaykowxvwoepil
+
+
 
