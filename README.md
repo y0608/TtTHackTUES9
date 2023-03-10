@@ -53,6 +53,9 @@ Python, Rpi, ESP32, ML, Telegram, Linux
 
 Свързвате Rpi-я към рутера, пискаме го, отваряме web application на локалната мрежа и пускаме да се търсят устройства
 
+#### 
+	Wireshark и Tshark трябва да се изтеглят със sudo
+
 ##### Python библиотеки
 ```import pyshark
 import datetime
