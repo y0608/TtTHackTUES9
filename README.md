@@ -54,7 +54,17 @@ Python, Rpi, ESP32, ML, Telegram, Linux
 Свързвате Rpi-я към рутера, пискаме го, отваряме web application на локалната мрежа и пускаме да се търсят устройства
 
 ##### Python библиотеки
-```
+```import pyshark
+import datetime
+import sqlite3
+import csv
+import os
+import pyshark
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+import pandas as pd
+import telebot
 ```
 ##### библиотеки за ESP-то, като симулация:
 ``` https://github.com/marian-craciunescu/ESP32Ping
