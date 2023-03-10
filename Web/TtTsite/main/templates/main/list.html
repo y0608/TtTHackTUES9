@@ -1,0 +1,38 @@
+{% extends 'main/base.html' %}
+
+
+{% block title %}
+
+{% endblock %}
+
+{% block name %}
+    {{device.name}}
+{% endblock %}
+
+{% block content %}
+
+<!-- 
+    <h3>Add Manually:</h3>
+    <form method="post" action="/create/"></form>
+    {{form}}
+    <button type="submit", name="save">Add to whitelist</button>
+
+    <form method="post" action="/create/"></form>
+    {{form}}
+    <button type="submit", name="save">Add to blacklist</button> -->
+
+    <h2>Whitelist IPs</h2>
+    <ul>
+        {% for whitelistip in device.whitelist_set.all %}
+            <li>{{whitelistip}}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Blacklist IPs</h2>
+    <ul>
+        {% for blacklistip in device.blacklist_set.all %}
+            <li>{{blacklistip}}</li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

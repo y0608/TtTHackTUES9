@@ -1,0 +1,18 @@
+{% extends 'main/base.html' %}
+
+
+{% block title %}
+    TtT home
+{% endblock %}
+
+{% block name %}
+    Home
+{% endblock %}
+
+{% block content %}
+    <ul>
+        {% for device in devices %}
+            <li>{{device.name}}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
