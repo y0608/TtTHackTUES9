@@ -10,6 +10,13 @@
 {% endblock %}
 
 {% block content %}
+    <form method="post" action="#">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-lg", name="getDevices", value="save">Get Devices</button>
+    </form>
+
+    <br><br>
+    
     <ul>
         {% for device in devices %}
             <!-- <li>{{device.name}}</li> -->

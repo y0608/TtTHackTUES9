@@ -26,6 +26,7 @@ def load_file(file_name):
 def cmp_mac_address_start(curr_mac_address, starts):
     for start in starts:
         if curr_mac_address == start:
+            print("in11212")
             return True
     return False
 
@@ -80,56 +81,14 @@ def get_valid_ips(ip):
     records = cursor.fetchall()
     return records
 
-def unblock_ip(ip):
-    # unblock ip
-    # remove from blacklist database if exists
-    whitelist_ip(ip)
-    pass
-
 def block_ip(ip):
-    # block ip
-    # remove from whitelist database if exists
+    # remove from whitelist database if exists in future
     blacklist_ip(ip)
-    pass
-
-def whitelist_ip(ip):
-    # add ip to the whitelist database
-    pass
-
-    # connection = sqlite3.connect(
-    # wldb_host, wldb_database, db_user, db_password)
-
-    #Creating a cursor object using the cursor() method
-    cursor = connection.cursor()
-    # Preparing SQL query to INSERT a record into the database.
-    sql = """"""
-
-    # Executing the SQL command
-    cursor.execute(sql)
-
-    # Commit your changes in the database
-    connection.commit()    
+    pass 
 
 def blacklist_ip(ip):
     # add ip to the blacklist database
     pass
-
-    connection = sqlite3.connect(
-    wldb_host, wldb_database, db_user, db_password)
-
-    #Creating a cursor object using the cursor() method
-    cursor = connection.cursor()
-
-    # Preparing SQL query to INSERT a record into the database.
-    sql = """INSERT INTO EMPLOYEE(
-    FIRST_NAME, LAST_NAME, AGE, SEX, INCOME)
-    VALUES ('Mac', 'Mohan', 20, 'M', 2000)"""
-
-    # Executing the SQL command
-    cursor.execute(sql)
-
-    # Commit your changes in the database
-    connection.commit()
 
 def IoT_to_Internet(source, destination):
     valid_ips = get_valid_ips(source)
@@ -148,26 +107,30 @@ def Internet_to_IoT(source, destination):
 
         ##DATABASE##    
 ##############################
-capture = pyshark.LiveCapture(interface='wlp3s0')
+starts=load_file('mac_addresses.txt')
+print(starts)
+
+capture = pyshark.LiveCapture(interface='wlp2s0')
 capture.sniff(timeout=10)
 print("aaa")
-strarts=load_file('file.txt')
 for packet in capture:
     try:
-        if cmp_mac_address_start(packet.eth.src,starts)==False:
+        if cmp_mac_address_start(packet.eth.src,starts) == False:
             pass
     except AttributeError as e:
         pass
+
+    print(packet)
     
-    row = make_dict(packet)
+    #row = make_dict(packet)
     #source, destination = get_source_and_destination(row)
-    print(row)
-    if row is None:
-        pass
-    source = row['src_addr']
-    destination = row['dst_addr']
+    #print(row)
+    #if row is None:
+     #   pass
+    #source = row['src_addr']
+    #destination = row['dst_addr']
     #IoT_to_Internet(source, destination)
     #Internet_to_IoT(source, destination)
-    csv_create(row)
+    #csv_create(row)
 
 ############################

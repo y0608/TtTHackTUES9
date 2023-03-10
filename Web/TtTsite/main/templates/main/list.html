@@ -28,7 +28,7 @@
             {% for whitelistip in device.whitelist_set.all %}
                 <li style="margin: 10px 0">
                     {{whitelistip}}
-                    <button type="button" class="btn btn-dark btn-sm", name="moveToBlacklist", value="save">Move to blacklist</button>
+                    <button type="submit" class="btn btn-dark btn-sm", name="moveToBlacklist", value="save">Move to blacklist</button>
                 </li>
             {% endfor %}
         </ul>
@@ -45,7 +45,7 @@
             {% for blacklistip in device.blacklist_set.all %}
             <li style="margin: 10px 0">
                 {{blacklistip}}
-                <button type="button" class="btn btn-info btn-sm", name="moveToWhitelist", value="save">Move to whitelist</button>
+                <button type="submit" class="btn btn-info btn-sm", name="moveToWhitelist", value="{{IDIDIDIDIDIDIDIDIDIDIIDDIIDDI}}">Move to whitelist</button>
             </li>
             {% endfor %}
         </ul>
