@@ -12,7 +12,8 @@
 {% block content %}
     <ul>
         {% for device in devices %}
-            <li>{{device.name}}</li>
+            <!-- <li>{{device.name}}</li> -->
+            <h2><a href="/{{device.id}}">{{device.name}}</a></h2>
         {% endfor %}
     </ul>
 {% endblock %}

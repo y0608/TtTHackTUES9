@@ -22,17 +22,36 @@
     <button type="submit", name="save">Add to blacklist</button> -->
 
     <h2>Whitelist IPs</h2>
-    <ul>
-        {% for whitelistip in device.whitelist_set.all %}
-            <li>{{whitelistip}}</li>
-        {% endfor %}
-    </ul>
+    <form method="post" action="#">
+        {% csrf_token %}
+        <ul>
+            {% for whitelistip in device.whitelist_set.all %}
+                <li style="margin: 10px 0">
+                    {{whitelistip}}
+                    <button type="button" class="btn btn-dark btn-sm", name="moveToBlacklist", value="save">Move to blacklist</button>
+                </li>
+            {% endfor %}
+        </ul>
+        <input type="text", name="new">
+        <button type="submit", name="newItemWhitelist", value="save">Add ip</button>
+    </form>
+
+    <br><br><br>
 
     <h2>Blacklist IPs</h2>
-    <ul>
-        {% for blacklistip in device.blacklist_set.all %}
-            <li>{{blacklistip}}</li>
-        {% endfor %}
-    </ul>
+    <form method="post" action="#">
+        {% csrf_token %}
+        <ul>
+            {% for blacklistip in device.blacklist_set.all %}
+            <li style="margin: 10px 0">
+                {{blacklistip}}
+                <button type="button" class="btn btn-info btn-sm", name="moveToWhitelist", value="save">Move to whitelist</button>
+            </li>
+            {% endfor %}
+        </ul>
+            <input type="text", name="new">
+            <button type="submit", name="newItemBlacklist", value="save">Add ip</button>
+    </form>
+
 
 {% endblock %}
