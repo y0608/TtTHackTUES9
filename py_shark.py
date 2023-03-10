@@ -1,15 +1,17 @@
 import pyshark
 
+#   Program for fainding the mac addresses of iot devices. 
+#   The program tracks the trafic in a network and compare the mac
+#   addresses of devices that generates trafic. If a mach is found 
+#   the program writes it.
 
-def load_file():
+def load_file(file_name):
     starts = []
-    with open('esp2.txt', 'r') as file:
+    with open(file_name, 'r') as file:
         for line in file:
             line = line[:-1]
             starts.append(line)
-
     return starts
-
 
 def cmp_mac_address_start(curr_mac_address, starts):
     for start in starts:
@@ -18,50 +20,27 @@ def cmp_mac_address_start(curr_mac_address, starts):
     return False
 
 def get_all_mac_addresses():
-    capture = pyshark.LiveCapture(interface='wlp2s0')
-    capture.sniff(timeout=10)
-    macaddresses = {}
-    starts = load_file()
-    mac_address = []
-    names = "" 
-    values = ""
-    
+    capture = pyshark.LiveCapture(interface = 'wlp2s0')
+    capture.sniff(timeout = 10)
+    starts = load_file("esp2.txt") #load the starts of mac addresses we want to track
+    mac_address = load_file("mac_addresses.txt") #load mac addresses we already added in the data base( no need to be added again )
+    timer = 400 #how many iterations before program breaks
+
     for packet in capture:
         if 'ETH Layer' in str(packet.layers):
-            
-            if packet.eth.src not in mac_address:
-                if cmp_mac_address_start(packet.eth.src, starts):
-                    mac_address.append(packet.eth.src)
-                    print("new mac address added: ", packet.eth.src)
-            
-            if(packet.eth.src in mac_address):
-                print("in")
-                print(packet)
-                if packet.eth.src not in macaddresses:
-                    macaddresses[packet.eth.src]=[]
-                
-                macaddresses[packet.eth.src].append({})
-                
-                if len(macaddresses[packet.eth.src])>25:
-                    macaddresses[packet.eth.src].pop(0)
-                
-                if 'IP' in packet:
-                    print("IP")
-                    names = packet.ip._all_fields
-                    values = packet.ip._all_fields.values()
-                
-                if 'IPv6' in packet:
-                    print("IPv6")
-                    names = packet.ipv6._all_fields
-                    values = packet.ipv6._all_fields.values()
-                
-                print(macaddresses[packet.eth.src][0])
+            mac_addr = packet.eth.src
 
-                for n,v in zip(names, values):
-                    macaddresses[packet.eth.src][len(macaddresses[packet.eth.src])-1][n] = v
-                    print(macaddresses[packet.eth.src][len(macaddresses[packet.eth.src])-1][n])
-
-            print(packet.eth.src)
+            if mac_addr not in mac_address and cmp_mac_address_start(mac_addr, starts):
+                mac_address.append(mac_addr)    
+                print("new mac address added: ", mac_addr)
+                with open("mac_addresses.txt", 'a') as f:
+                    f.write(mac_addr + '\n') #add the new mac address in the text file ( not to be added again )
+            
+            print(mac_addr + " " + str(timer))
+        
+        timer -= 1
+        if timer == 0:
+            return
+            
 
 get_all_mac_addresses()
-
