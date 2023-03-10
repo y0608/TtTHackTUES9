@@ -2,18 +2,18 @@
 
 #include <ESP32Ping.h>  /*including the ping library*/
 
-const char* ssid = "Indiana"; /*Define network SSID*/
+const char* ssid = "TtTAnakin"; /*Define network SSID*/
 
-const char* password ="mitko123"; /*Define Network Password*/
+const char* password = "mitko123"; /*Define Network Password*/
 
-// Set your Static IP address
-IPAddress local_IP(192, 168, 1, 184);
-// Set your Gateway IP address
-IPAddress gateway(192, 168, 43, 250);
-
-IPAddress subnet(255, 255, 0, 0);
-IPAddress primaryDNS(8, 8, 8, 8);   //optional`
-IPAddress secondaryDNS(8, 8, 4, 4); //optional
+//// Set your Static IP address
+//IPAddress local_IP(192, 168, 1, 184);
+//// Set your Gateway IP address
+//IPAddress gateway(192, 168, 5, 1);
+//
+//IPAddress subnet(255, 255, 0, 0);
+//IPAddress primaryDNS(8, 8, 8, 8);   //optional`
+//IPAddress secondaryDNS(8, 8, 4, 4); //optional
 
 void setup() {
 
@@ -24,36 +24,33 @@ void setup() {
   while (WiFi.status() != WL_CONNECTED) {
 
     delay(500);
-  
+
     Serial.println("Connecting to WiFi...");
-    
 
- }
 
- if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
-    Serial.println("STA Failed to configure");
   }
 
- 
+
+
 }
 
 void loop() {
- Serial.println(WiFi.localIP());
+  Serial.println(WiFi.localIP());
 
- bool success = Ping.ping("8.8.8.8", 3);  /*ping ESP32 using google*/
- //success = Ping.ping("www.youtube.com", 3);  /*ping ESP32 using google*/
- //success = Ping.ping("www.instagram.com", 3);  /*ping ESP32 using google*/
- //success = Ping.ping("www.alo.bg", 3);  /*ping ESP32 using google*/
- //success = Ping.ping("www.bg-mamma.com", 3);  /*ping ESP32 using google*/
-// success = Ping.ping("www.bg-mamma.com", 3);  /*ping ESP32 using google*/
+  bool success = Ping.ping("8.8.8.8", 3);  /*ping ESP32 using google*/
+  success = Ping.ping("1.1.1.1", 3);  /*ping ESP32 using google*/
+  //success = Ping.ping("www.instagram.com", 3);  /*ping ESP32 using google*/
+  //success = Ping.ping("www.alo.bg", 3);  /*ping ESP32 using google*/
+  //success = Ping.ping("www.bg-mamma.com", 3);  /*ping ESP32 using google*/
+  // success = Ping.ping("www.bg-mamma.com", 3);  /*ping ESP32 using google*/
 
- if(!success){
+  if (!success) {
 
-  Serial.println("Ping failed");
+    Serial.println("Ping failed");
 
-  return;
+    return;
 
- }
+  }
   Serial.println("Ping successful.");
   delay(1500);
 }
