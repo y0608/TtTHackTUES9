@@ -38,7 +38,9 @@
  
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
  
-	<title>{% block title %}Tim's Site{% endblock %}</title>
+    {% if user.is_authenticated %}
+	    <title>{% block title %}Tim's Site{% endblock %}</title>
+    {% endif %}
 </head>
  
 <body>
@@ -50,10 +52,17 @@
 	<div id="content" name="content" class="main">
 		<div class="row justify-content-center">
 			<div class="col-8">
+                
+                {% if user.is_authenticated %}
 				<h1 class="mt-5">{% block name %}Device{% endblock %}</h1>
 				<hr class="mt-0 mb-4">
-				{% block content %}
-				{% endblock %}
+                    {% block content %}
+                    {% endblock %}
+                {% else %}
+    				<h1 class="mt-5">Not an admin</h1>
+                    <p>Sorry, you are not logged in :(</p>
+                    <p>You should be an admin! Head to /admin to log in</p>
+                {% endif %}
 			</div>
 		</div>
 	</div>
