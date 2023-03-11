@@ -8,11 +8,19 @@ import ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
+import subprocess
+import sys
 
 
 def send_mail(src_ip, dst_ip):
-
-    receiver_list = ['victorhandzhiev@gmail.com']
+    
+    connection = sqlite3.connect('db.sqlite3')
+    sql_select_Query = "SELECT auth_user.email FROM auth_user"
+    cursor = connection.cursor()
+    cursor.execute(sql_select_Query)
+    records = cursor.fetchall()
+    connection.close()
+    receiver_list = ['jivkon1410@gmail.com']
     body = """
     Source IP(blocked): {}
 
@@ -41,6 +49,8 @@ mail_server.connect("smtp.gmail.com", port)
 mail_server.ehlo()
 mail_server.login("hacktues9TtT@gmail.com", password)
 
+    
+
 
 def load_file(file_name):
     starts = []
@@ -63,23 +73,23 @@ def make_dict(packet):
         time = datetime.datetime.now()
         packet_info['localtime'] = time.year*10000000000 + time.month * 100000000 + time.day * 1000000 + time.hour*10000 + time.minute*100 + time.second
         packet_info['src_port']  = 1                                              # source port
-        packet_info['src_mac']   = int(packet.eth.src.replace(':',''),16)         # source mac
+        packet_info['src_mac']   = packet.eth.src         # source mac
         packet_info['dst_port']  = 1                                              # destination port
-        packet_info['dst_mac']   = int(packet.eth.dst.replace(':',''),16)         # destination mac
+        packet_info['dst_mac']   = packet.eth.dst         # destination mac
         packet_info['size']      = len(packet)                                    # length of the packet
         packet_info['malicious'] = 0
         
         if 'TCP' in packet or 'UDP' in packet:
-            packet_info['src_port']  = int(packet[packet.transport_layer].srcport)   # source port
-            packet_info['dst_port']  = int(packet[packet.transport_layer].dstport)   # destination port
+            packet_info['src_port']  = packet[packet.transport_layer].srcport   # source port
+            packet_info['dst_port']  = packet[packet.transport_layer].dstport   # destination port
 
         if 'IP' in packet:
             print("asdf")
-            packet_info['dst_addr']  = int(packet.ip.dst.replace('.',''))             # destination address
-            packet_info['src_addr']  = int(packet.ip.src.replace('.',''))             # source address
+            packet_info['dst_addr']  = packet.ip.dst             # destination address
+            packet_info['src_addr']  = packet.ip.src             # source address
         if 'IPv6' in packet:
-            packet_info['dst_addr']  = int(packet.ip.dst.replace(':',''), 16)             # destination address
-            packet_info['src_addr']  = int(packet.ip.src.replace(':',''), 16)             # source address
+            packet_info['dst_addr']  = packet.ip.dst             # destination address
+            packet_info['src_addr']  = packet.ip.src             # source address
 
     except AttributeError as e:
         # ignore packets other than TCP, UDP and IPv4
@@ -90,12 +100,28 @@ def csv_create(input):
     # create a csv file for the ML training
     pass
     # field names 
+    packet_info={}
+    packet_info['localtime'] = input['localtime']
+    packet_info['src_port']  = int(input['src_port'])                                      # source port
+    packet_info['src_mac']   = int(input['src_mac'].replace(':',''),16)         # source mac
+    packet_info['dst_port']  = int(input['dst_port'])                                              # destination port
+    packet_info['dst_mac']   = int(input['dst_mac'].replace(':',''),16)         # destination mac
+    packet_info['size']      = input['size']                                    # length of the packet
+    packet_info['malicious'] = 0
+#IPv4
+    if '.' in input['dst_addr']:
+        packet_info['dst_addr']  = int(input['dst_addr'].replace('.',''))             # destination address
+        packet_info['src_addr']  = int(input['src_addr'].replace('.',''))             # source address
+#IPv6   
+    if ':' in input['dst_addr']:
+        packet_info['dst_addr']  = int(input['dst_addr'].replace(':',''), 16)             # destination address
+        packet_info['src_addr']  = int(input['src_addr'].replace(':',''), 16)  
     fields = ['localtime','src_addr','src_port','src_mac','dst_addr','dst_port','dst_mac','size','malicious'] 
     with open('traffic.csv', 'a', newline='') as file: 
         writer = csv.DictWriter(file, fieldnames = fields)
         if os.path.getsize('traffic.csv')==0:
             writer.writeheader()
-        writer.writerow(input)
+        writer.writerow(packet_info)
 
 connection = sqlite3.connect('mydb.db')
 
@@ -122,8 +148,16 @@ def get_valid_ips(ip):
 
 def block_ip(ip):
     # remove from whitelist database if exists in future
-    
-    pass 
+    command = "iptables -A drop_blocked_lan_ip -i wlan0 -s " + ip + " -j DROP"
+    subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    pass
+
+def unblock_ip(ip):
+    # remove from whitelist database if exists in future
+    command = "iptables -D drop_blocked_lan_ip -i wlan0 -s " + ip + " -j DROP"
+    subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    whitelist_ip(ip)
+    pass
 
 def whitelist_ip(ip,add_ip):
     # add ip to the blacklist database
@@ -156,7 +190,6 @@ def blacklist_ip(ip,blocked_ip):
     if device_id:
         cursor.execute(sql_insert_Query,(blocked_ip,device_id[0]))
         connection.commit()
-        block_ip(blocked_ip)
     connection.close()
 
 def IoT_to_Internet(source, destination):
@@ -173,7 +206,8 @@ def IoT_to_Internet(source, destination):
     if 1 > valid_ips.count(destination):
         send_mail(source, destination)
         mail_server.quit()
-        #blacklist_ip(source,destination)
+        block_ip(source)
+        blacklist_ip(source,destination)
         return
 
 def Internet_to_IoT(source, destination):
@@ -191,29 +225,32 @@ def Internet_to_IoT(source, destination):
         send_mail(source, destination)
         mail_server.quit()
         blacklist_ip(destination,source)
+        block_ip(source)
         return
 
 
         ##DATABASE##    
 ##############################
 starts=load_file('mac_addresses.txt')
-capture = pyshark.LiveCapture(interface='wlan0')
+capture = pyshark.LiveCapture(interface='wlp3s0')
 capture.sniff(timeout=10)
 print("aaa")
+send_mail("aaaa","aaaaa")
 for packet in capture:
-    src = cmp_mac_address_start(packet.eth.src,starts)
-    dst = cmp_mac_address_start(packet.eth.dst,starts)
-    if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and (src or dst):
-        row = make_dict(packet)
-        if row is None:
-            pass
-        source = row['src_addr']
-        destination = row['dst_addr']
-        if src:
-            IoT_to_Internet(source, destination)
-        if dst:
-            Internet_to_IoT(source, destination)
-        csv_create(row)
+     src = cmp_mac_address_start(packet.eth.src,starts)
+     dst = cmp_mac_address_start(packet.eth.dst,starts)
+     if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and (src or dst):
+         row = make_dict(packet)
+         if row is None:
+             pass
+         print(row)
+         source = row['src_addr']
+         destination = row['dst_addr']
+         if src:
+             IoT_to_Internet(source, destination)
+         if dst:
+             Internet_to_IoT(source, destination)
+         csv_create(row)
 
 ############################byuaykowxvwoepil
 
