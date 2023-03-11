@@ -76,7 +76,8 @@
 Свързвате Rpi-я към рутера, пускаме го, отваряме web application на локалната мрежа и пускаме да се търсят устройства.
 
 #### 
-	Wireshark и Tshark трябва да се изтеглят със sudo
+	sudo apt install wireshark
+	sudo apt install tshark
 
 ##### Python библиотеки
 ```import pyshark
