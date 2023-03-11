@@ -20,7 +20,7 @@ def cmp_mac_address_start(curr_mac_address, starts):
     return False
 
 def get_all_mac_addresses():
-    capture = pyshark.LiveCapture(interface = 'wlp2s0')
+    capture = pyshark.LiveCapture(interface = 'wlan0')
     capture.sniff(timeout = 10)
     starts = load_file("iot_devices_mac_addresses.txt") #load the starts of mac addresses we want to track
     mac_address = load_file("mac_addresses.txt") #load mac addresses we already added in the data base( no need to be added again )
@@ -29,12 +29,15 @@ def get_all_mac_addresses():
     for packet in capture:
         if 'ETH Layer' in str(packet.layers):
             mac_addr = packet.eth.src
-
+            if 'IP' in packet:
+                ip_addr = packet.ip.src
             if mac_addr not in mac_address and cmp_mac_address_start(mac_addr, starts):
                 mac_address.append(mac_addr)    
                 print("new mac address added: ", mac_addr)
                 with open("mac_addresses.txt", 'a') as f:
                     f.write(mac_addr + '\n') #add the new mac address in the text file ( not to be added again )
+                with open("ip_addresses.txt", 'a') as f:
+                    f.write(ip_addr + '\n')
             
             print(mac_addr + " " + str(timer))
         
@@ -42,5 +45,5 @@ def get_all_mac_addresses():
         if timer == 0:
             return
             
-
-get_all_mac_addresses()
+while True:
+    get_all_mac_addresses()

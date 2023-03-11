@@ -79,7 +79,11 @@ def home(response):
             print("Getting devices")
             
             #TODO: add path that is only in the project ("../../../Firewall/mac_addresses.txt")
-            macAddresses = load_file("/home/yoan/Documents/Programming/ProgrammingSchool/11grade/TtTHackTUES9/Firewall/mac_addresses.txt")
+            macAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/mac_addresses.txt")
+             #TODO: add path that is only in the project ("../../../Firewall/mac_addresses.txt")
+            #macAddresses = load_file(" #TODO: add path that is only in the project ("../../../Firewall/mac_addresses.txt")
+            #macAddresses = load_file("/home/yoan/Documents/Programming/ProgrammingSchool/11grade/TtTHackTUES9/Firewall/mac_addresses.txt")
+            ipAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/ip_addresses.txt")
             
             # devices.delete()
             # for macAddress in macAddresses:
@@ -87,18 +91,22 @@ def home(response):
             #     newDevice.save()
                     
             ## if we want to only add new devices
-            for macAddress in macAddresses:
-                if(macAddress == ''):
-                    continue
-                
-                newDevice = IotDevice(name="blank name",mac=macAddress,ip="blank ip")
-                # save only if not saved yet
+            for i in range(len(macAddresses)):
+                newDevice = IotDevice(name="blank name",mac=macAddresses[i],ip=ipAddresses[i])
                 shouldSave = True
                 for device in devices:
-                    if newDevice.name == device.name :
+                    if newDevice.ip == device.ip:
                         shouldSave = False
                 if(shouldSave):
                     newDevice.save()
+
+
+            # devices.delete()
+            # for macAddress in macAddresses:
+            #     newDevice = IotDevice(name="blank name",mac=macAddress,ip="blank ip")
+            #     newDevice.save()
+                    
+            ## if we want t
                     
         elif response.POST.get("removeDevice"):
             print("removeDevice")

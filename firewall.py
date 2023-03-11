@@ -3,6 +3,8 @@ import datetime
 import sqlite3
 import csv
 import os
+import subprocess
+import sys
 
 db_user = ''
 db_password = ''
@@ -93,8 +95,17 @@ def get_valid_ips(ip):
 
 def block_ip(ip):
     # remove from whitelist database if exists in future
+    command = "iptables -A drop_blocked_lan_ip -i wlan0 -s " + ip + " -j DROP"
+    subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     blacklist_ip(ip)
-    pass 
+    pass
+
+def unblock_ip(ip):
+    # remove from whitelist database if exists in future
+    command = "iptables -D drop_blocked_lan_ip -i wlan0 -s " + ip + " -j DROP"
+    subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    whitelist_ip(ip)
+    pass
 
 def whitelist_ip(ip,add_ip):
     # add ip to the blacklist database
