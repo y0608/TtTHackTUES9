@@ -20,7 +20,7 @@ def send_mail(src_ip, dst_ip):
     cursor.execute(sql_select_Query)
     records = cursor.fetchall()
     connection.close()
-    receiver_list = ['jivkon1410@gmail.com']
+    receiver_list = [str(records[0]).replace(',','').replace('(','').replace(')','').replace("'",'')]
     body = """
     Source IP(blocked): {}
 
@@ -49,7 +49,9 @@ mail_server.connect("smtp.gmail.com", port)
 mail_server.ehlo()
 mail_server.login("hacktues9TtT@gmail.com", password)
 
-    
+
+
+
 
 
 def load_file(file_name):
@@ -150,14 +152,12 @@ def block_ip(ip):
     # remove from whitelist database if exists in future
     command = "iptables -A drop_blocked_lan_ip -i wlan0 -s " + ip + " -j DROP"
     subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-    pass
 
 def unblock_ip(ip):
     # remove from whitelist database if exists in future
     command = "iptables -D drop_blocked_lan_ip -i wlan0 -s " + ip + " -j DROP"
     subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     whitelist_ip(ip)
-    pass
 
 def whitelist_ip(ip,add_ip):
     # add ip to the blacklist database
@@ -236,22 +236,42 @@ capture = pyshark.LiveCapture(interface='wlp3s0')
 capture.sniff(timeout=10)
 print("aaa")
 send_mail("aaaa","aaaaa")
+blocked=False
 for packet in capture:
-     src = cmp_mac_address_start(packet.eth.src,starts)
-     dst = cmp_mac_address_start(packet.eth.dst,starts)
-     if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and (src or dst):
-         row = make_dict(packet)
-         if row is None:
-             pass
-         print(row)
-         source = row['src_addr']
-         destination = row['dst_addr']
-         if src:
-             IoT_to_Internet(source, destination)
-         if dst:
-             Internet_to_IoT(source, destination)
-         csv_create(row)
-
+    src = cmp_mac_address_start(packet.eth.src,starts)
+    dst = cmp_mac_address_start(packet.eth.dst,starts)
+    if 'ETH Layer' in str(packet.layers) and ('IP' in packet or 'IPv6' in packet) and (src or dst):
+        row = make_dict(packet)
+        if row is None:
+            pass
+        print(row)
+        source = row['src_addr']
+        destination = row['dst_addr']
+        if src:
+            IoT_to_Internet(source, destination)
+        if dst:
+            Internet_to_IoT(source, destination)
+        csv_create(row)
+    connection = sqlite3.connect('db.sqlite3')
+    sql_select_Query = "select count(main_blacklist.id) from main_blacklist left join main_iotdevice on main_iotdevice.id==main_blacklist.device_id"
+    cursor = connection.cursor()
+    cursor.execute(sql_select_Query)
+    count = cursor.fetchone()
+    if(count == 0):
+        if(blocked == True):
+            if src:
+                unblock_ip(source)
+            if dst:
+                unblock_ip(destination)
+            blocked = False
+    else:
+        if(blocked == False):
+            if src:
+                block_ip(source)
+            if dst:
+                block_ip(destination)
+            blocked = True
+    connection.close()
 ############################byuaykowxvwoepil
 
 

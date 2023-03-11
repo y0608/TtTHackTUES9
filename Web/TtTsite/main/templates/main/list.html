@@ -39,9 +39,11 @@
 
     <br><br><br>
 
-    <h2>Blacklist IPs</h2>
     <form method="post" action="#">
         {% csrf_token %}
+        <h2>Blacklist IPs </h2>
+        <!-- <button type="submit" class="btn btn-danger btn-sm", name="removeAllFromBlackList", value="save">Clear all</button></h2> -->
+        
         <ul>
             {% for blacklistip in device.blacklist_set.all %}
                 <li style="margin: 10px 0">

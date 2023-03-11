@@ -5,6 +5,7 @@ from .models import IotDevice, Whitelist, Blacklist
 from django.shortcuts import render
 from django.urls import reverse
 
+
 # Create your views here.
 
 def load_file(file_name):
@@ -27,6 +28,7 @@ def index(response,id):
             else:
                 print("invalid")
         elif response.POST.get("newItemBlacklist"):
+            #TODO: провери дали го има в whitelist
             txt = response.POST.get("new")    
             if len(txt) > 2:
                 device.blacklist_set.create(ip=txt)
@@ -58,6 +60,13 @@ def index(response,id):
             id = int(response.POST.get("removeFromBlackList"))
             currentDevice = device.blacklist_set.all().filter(id=id)
             currentDevice.delete()
+        
+        #TODO: make this button:
+        # elif response.POST.get("removeAllFromBlackList"):
+        #     print("removeAllFromBlackList")
+        #     id = int(response.POST.get("removeAllFromBlackList"))
+        #     currentDevice = device.blacklist_set.all().filter(id=id)
+        #     currentDevice.delete()    
             
     return render(response,"main/list.html",{"device":device})
 

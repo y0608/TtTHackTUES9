@@ -12,13 +12,13 @@ class IotDevice(models.Model):
         return self.name
 
 
+#TODO:add a date and time column to whitelist and blacklist
 class Whitelist(models.Model):
     device = models.ForeignKey(IotDevice, on_delete=models.CASCADE)
     ip = models.CharField(max_length=100)
 
     def __str__(self):
         return self.ip
-
 
 class Blacklist(models.Model):
     device = models.ForeignKey(IotDevice, on_delete=models.CASCADE)
