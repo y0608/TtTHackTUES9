@@ -40,7 +40,7 @@
 
 
 В демото използваме 4G modem и блок схемата изглежда така:
-<img src="[https://user-images.githubusercontent.com/54147006/224466525-6257799c-ea5f-4923-a91f-05da1c92cab5.png](https://user-images.githubusercontent.com/54147006/224460359-d85db717-a031-462c-afcc-f1c13b4665e5.png)" alt="drawing" style="width:700px;"/>
+<img src="https://user-images.githubusercontent.com/54147006/224460359-d85db717-a031-462c-afcc-f1c13b4665e5.png" alt="drawing" style="width:700px;"/>
 
 
 #### Web application
