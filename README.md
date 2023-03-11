@@ -1,7 +1,8 @@
 # Project for HackTUES 9
 <img src="https://user-images.githubusercontent.com/54147006/223833805-b6605af7-7064-48b1-a1cc-a11ebe7d86f6.png" alt="drawing" style="width:900px;"/>
 
-Нашият проект цели да създаде защитна система за всички IoT устройства в нашия дом, офис и други. 
+Нашият проект цели да създаде защитна система за всички IoT устройства в нашия дом, офис и други. <br>
+Presentation: https://prezi.com/view/wxg1Yyg6mbjlCkAzTpi7/
 <br/>
 
 # TtT IoT Firewall - Firewall for all of your IoT devices
