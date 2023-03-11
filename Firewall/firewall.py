@@ -158,7 +158,7 @@ def unblock_ip(ip):
 
 def whitelist_ip(ip,add_ip):
     # add ip to the blacklist database
-    print("whitelist enter")
+  #  print("whitelist enter")
     connection = sqlite3.connect('/home/indiana/TtTAnakin/TtTHackTUES9/Web/TtTsite/db.sqlite3')
     sql_select_Query = "select main_iotdevice.id from main_iotdevice where main_iotdevice.ip==?"
     cursor = connection.cursor()
@@ -166,7 +166,7 @@ def whitelist_ip(ip,add_ip):
     device_id = cursor.fetchone()
     sql_insert_Query = "insert into main_whitelist(ip,device_id)values(?,?)"
     if device_id:
-        print("whitelist if enter")
+ #       print("whitelist if enter")
         cursor.execute(sql_insert_Query,(add_ip,device_id[0]))
         connection.commit()
     connection.close()
@@ -245,7 +245,7 @@ for packet in capture:
         row = make_dict(packet)
         if row is None:
             pass
-        print(row)
+#        print(row)
         source = row['src_addr']
         destination = row['dst_addr']
         if src:
@@ -259,12 +259,14 @@ for packet in capture:
         cursor = connection.cursor()
         cursor.execute(sql_select_Query)
         devices_ip=cursor.fetchall()
+#       	print(devices_ip)
         for i in devices_ip:
             sql_select_Query = "select count(main_blacklist.id) from main_blacklist left join main_iotdevice on main_iotdevice.id==main_blacklist.device_id and main_iotdevice.ip==?"
             cursor = connection.cursor()
-            print("i:" + str(i))
+#            print("i:" + str(i))
             cursor.execute(sql_select_Query, (str(i),))
             count = cursor.fetchone()
+            print(count)
             if(count == 0):
                if(blocked == True):
                     if src:
@@ -291,5 +293,3 @@ for packet in capture:
                     blocked = True
 #            connection.close()
 ############################
-
-
