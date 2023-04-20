@@ -1,13 +1,15 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse
-from .models import IotDevice, Whitelist, Blacklist
-
-from django.shortcuts import render
 from django.urls import reverse
 
+from .models import IotDevice, Whitelist, Blacklist
 from .find_devices import get_devices
 
 # Create your views here.
+
+option1 = True
+option2 = True
+option3 = True
 
 def load_file(file_name):
     starts = []
@@ -78,31 +80,7 @@ def home(response):
     if response.method == "POST":
         if response.POST.get("getDevices"):
             print("Getting devices")
-            get_devices(True,True,True)
-            
-            #TODO: add path that is only in the project ("../../../Firewall/mac_addresses.txt")
-            # macAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/mac_addresses.txt")
-            # ipAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/ip_addresses.txt")
-            
-            # devices.delete()
-            # for macAddress in macAddresses:
-            #     newDevice = IotDevice(name="blank name",mac=macAddress,ip="blank ip")
-            #     newDevice.save()
-                    
-            ## if we want to only add new devices
-            # for i in range(len(macAddresses)):
-            #     newDevice = IotDevice(name="blank name",ip=ipAddresses[i])
-            #     shouldSave = True
-            #     for device in devices:
-            #         if newDevice.ip == device.ip:
-            #             shouldSave = False
-            #     if(shouldSave):
-            #         newDevice.save()
-
-            # devices.delete()
-            # for macAddress in macAddresses:
-            #     newDevice = IotDevice(name="blank name",mac=macAddress,ip="blank ip")
-            #     newDevice.save()
+            get_devices(option1,option2,option3)
                     
         elif response.POST.get("removeDevice"):
             print("removeDevice")
@@ -111,3 +89,29 @@ def home(response):
             currentDevice.delete()
                     
     return render(response,"main/home.html",{"devices":devices})
+
+def settings(request):
+    # TODO: rename and set perm1, perm2, perm3
+    global option1, option2, option3
+    checkboxes = [{"name":"Packet count", "enabled": option1},
+                  {"name":"Max 5 whitelisted", "enabled": option2},
+                  {"name":"Packet size", "enabled": option3}]
+    if request.method == "POST":
+        options = request.POST.getlist("options")
+        if(options.__contains__("Packet count")):
+            option1 = True
+        else:
+            option1 = False
+            
+        if(options.__contains__("Max 5 whitelisted")):
+            option2 = True
+        else:
+            option2 = False
+            
+        if(options.__contains__("Packet size")):
+            option3 = True
+        else:
+            option3 = False
+        print(option1,option2,option3)
+        return redirect("/")
+    return render(request,"main/settings.html",{"options":checkboxes})    

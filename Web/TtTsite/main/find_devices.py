@@ -71,10 +71,6 @@ def get_devices(perm_1=True, perm_2=True, perm_3=True):
 
     # add the first five ip destination addresses
     for packet in capture.sniff_continuously():
-        if('IP' in packet):
-            if(packet.eth.src == "fc:d9:08:12:57:36"):
-                print("\n\n\n\naaaaaaaaa\n\n\n\n")
-            print(packet.eth.src + " " + packet.ip.src + " " + packet.ip.dst)
         # perm_1,2,3 are the different filters
         # if perm_3 and packet.size > 1024:
         #     return
@@ -113,6 +109,6 @@ def get_devices(perm_1=True, perm_2=True, perm_3=True):
                     pass
                 print(f"Added {packet.ip.dst} to {packet.ip.src}")
 
-        # timer -= 1
+        timer -= 1
         if perm_1 and timer == 0:
             return

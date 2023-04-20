@@ -1,0 +1,35 @@
+{% extends 'main/base.html' %}
+
+
+{% block title %}
+    TtT settings
+{% endblock %}
+
+{% block name %}
+    Settings
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% for option in options %}
+            {% if option.enabled == True %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" 
+                        value="{{option.name}}" id="{{option.name}}" 
+                        name="options" checked>
+                    <label class="form-check-label" for="{{option.name}}">{{option.name}}</label>
+                </div>
+            {% else %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" 
+                        value="{{option.name}}" id="{{option.name}}" 
+                        name="options">
+                    <label class="form-check-label" for="{{option.name}}">{{option.name}}</label>
+                </div>
+            {% endif %}
+        {% endfor %}
+    <br>
+    <button type="submit" class="btn btn-success">submit</button>
+    </form>
+{% endblock %}
