@@ -19,7 +19,7 @@ class Whitelist(models.Model):
     protocol = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.ip
+        return self.dst_ip
 
 class Blacklist(models.Model):
     device = models.ForeignKey(IotDevice, on_delete=models.CASCADE)
@@ -30,4 +30,4 @@ class Blacklist(models.Model):
     protocol = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.ip
+        return self.dst_ip

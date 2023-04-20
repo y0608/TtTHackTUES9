@@ -41,14 +41,14 @@ def index(response,id):
         elif response.POST.get("whiteToBlacklist"):            
             id = int(response.POST.get("whiteToBlacklist"))
             currentDevice = device.whitelist_set.all().filter(id=id)
-            tempip = currentDevice[0].ip
+            tempip = currentDevice[0].dst_ip
             currentDevice.delete()
             device.blacklist_set.create(dst_ip=tempip)
             
         elif response.POST.get("blackToWhitelist"):
             id = int(response.POST.get("blackToWhitelist"))
             currentDevice = device.blacklist_set.all().filter(id=id)
-            tempip = currentDevice[0].ip
+            tempip = currentDevice[0].dst_ip
             currentDevice.delete()
             device.whitelist_set.create(dst_ip=tempip)
             

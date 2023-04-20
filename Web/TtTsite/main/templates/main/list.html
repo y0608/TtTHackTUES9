@@ -10,52 +10,45 @@
 {% endblock %}
 
 {% block content %}
-
-<!-- 
-    <h3>Add Manually:</h3>
-    <form method="post" action="/create/"></form>
-    {{form}}
-    <button type="submit", name="save">Add to whitelist</button>
-
-    <form method="post" action="/create/"></form>
-    {{form}}
-    <button type="submit", name="save">Add to blacklist</button> -->
-
-    <h2>Whitelist IPs</h2>
-    <form method="post" action="#">
-        {% csrf_token %}
-        <ul>
-            {% for whitelistip in device.whitelist_set.all %}
-                <li style="margin: 10px 0">
-                    {{whitelistip}}
-                    <button type="submit" class="btn btn-dark btn-sm", name="whiteToBlacklist", value="{{whitelistip.id}}">Move to blacklist</button>
-                    <button type="submit" class="btn btn-danger btn-sm", name="removeFromWhiteList", value="{{whitelistip.id}}">Delete</button>
-                </li>
-            {% endfor %}
-        </ul>
-        <input type="text", name="new">
-        <button type="submit", name="newItemWhitelist", value="save">Add ip</button>
-    </form>
-
-    <br><br><br>
-
-    <h2>Blacklist IPs </h2>
-    <form method="post" action="#">
-        {% csrf_token %}
-        <!-- <button type="submit" class="btn btn-danger btn-sm", name="removeAllFromBlackList", value="save">Clear all</button></h2> -->
+ 
+    <div class="row">
+        <div class="col">
+            <h2>Whitelist IPs</h2>
+            <form method="post" action="#">
+                {% csrf_token %}
+                <ul>
+                    {% for whitelistip in device.whitelist_set.all %}
+                        <li style="margin: 10px 0">
+                            {{whitelistip.dst_ip}}
+                            <button type="submit" class="btn btn-dark btn-sm", name="whiteToBlacklist", value="{{whitelistip.id}}">Move to blacklist</button>
+                            <button type="submit" class="btn btn-danger btn-sm", name="removeFromWhiteList", value="{{whitelistip.id}}">Delete</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <input type="text" name="new" placeholder="Enter ip/website name">
+                <button type="submit" class="btn btn-primary btn-sm" name="newItemWhitelist" value="save">Add ip</button>
+            </form>
+        </div>
         
-        <ul>
-            {% for blacklistip in device.blacklist_set.all %}
-                <li style="margin: 10px 0">
-                    {{blacklistip}}
-                    <button type="submit" class="btn btn-info btn-sm", name="blackToWhitelist", value="{{blacklistip.id}}">Move to whitelist</button>
-                    <button type="submit" class="btn btn-danger btn-sm", name="removeFromBlackList", value="{{blacklistip.id}}">Delete</button>
-                </li>
-            {% endfor %}
-        </ul>
-        <input type="text", name="new">
-        <button type="submit", name="newItemBlacklist", value="save">Add ip</button>
-    </form>
-
+        <div class="col">
+            <h2>Blacklist IPs </h2>
+            <form method="post" action="#">
+                {% csrf_token %}
+                <!-- <button type="submit" class="btn btn-danger btn-sm", name="removeAllFromBlackList", value="save">Clear all</button></h2> -->
+                
+                <ul>
+                    {% for blacklistip in device.blacklist_set.all %}
+                        <li style="margin: 10px 0">
+                            {{blacklistip.dst_ip}}
+                            <button type="submit" class="btn btn-info btn-sm", name="blackToWhitelist", value="{{blacklistip.id}}">Move to whitelist</button>
+                            <button type="submit" class="btn btn-danger btn-sm", name="removeFromBlackList", value="{{blacklistip.id}}">Delete</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <input type="text" name="new" placeholder="Enter ip/website name">
+                <button type="submit"  class="btn btn-primary btn-sm" name="newItemBlacklist" value="save">Add ip</button>
+            </form>
+        </div>
+    </div>
 
 {% endblock %}
