@@ -5,6 +5,7 @@ from .models import IotDevice, Whitelist, Blacklist
 from django.shortcuts import render
 from django.urls import reverse
 
+from .find_devices import get_devices
 
 # Create your views here.
 
@@ -24,14 +25,14 @@ def index(response,id):
         if response.POST.get("newItemWhitelist"):
             txt = response.POST.get("new")    
             if len(txt) > 2:
-                device.whitelist_set.create(ip=txt)
+                device.whitelist_set.create(dst_ip=txt)
             else:
                 print("invalid")
         elif response.POST.get("newItemBlacklist"):
             #TODO: провери дали го има в whitelist
             txt = response.POST.get("new")    
             if len(txt) > 2:
-                device.blacklist_set.create(ip=txt)
+                device.blacklist_set.create(dst_ip=txt)
             else:
                 print("invalid")
                       
@@ -40,14 +41,14 @@ def index(response,id):
             currentDevice = device.whitelist_set.all().filter(id=id)
             tempip = currentDevice[0].ip
             currentDevice.delete()
-            device.blacklist_set.create(ip=tempip)
+            device.blacklist_set.create(dst_ip=tempip)
             
         elif response.POST.get("blackToWhitelist"):
             id = int(response.POST.get("blackToWhitelist"))
             currentDevice = device.blacklist_set.all().filter(id=id)
             tempip = currentDevice[0].ip
             currentDevice.delete()
-            device.whitelist_set.create(ip=tempip)
+            device.whitelist_set.create(dst_ip=tempip)
             
         elif response.POST.get("removeFromWhiteList"):
             print("remove from whitelist")
@@ -77,13 +78,11 @@ def home(response):
     if response.method == "POST":
         if response.POST.get("getDevices"):
             print("Getting devices")
+            get_devices(True,True,True)
             
             #TODO: add path that is only in the project ("../../../Firewall/mac_addresses.txt")
-            macAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/mac_addresses.txt")
-             #TODO: add path that is only in the project ("../../../Firewall/mac_addresses.txt")
-            #macAddresses = load_file(" #TODO: add path that is only in the project ("../../../Firewall/mac_addresses.txt")
-            #macAddresses = load_file("/home/yoan/Documents/Programming/ProgrammingSchool/11grade/TtTHackTUES9/Firewall/mac_addresses.txt")
-            ipAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/ip_addresses.txt")
+            # macAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/mac_addresses.txt")
+            # ipAddresses = load_file("/home/indiana/TtTAnakin/TtTHackTUES9/Firewall/ip_addresses.txt")
             
             # devices.delete()
             # for macAddress in macAddresses:
@@ -91,22 +90,19 @@ def home(response):
             #     newDevice.save()
                     
             ## if we want to only add new devices
-            for i in range(len(macAddresses)):
-                newDevice = IotDevice(name="blank name",mac=macAddresses[i],ip=ipAddresses[i])
-                shouldSave = True
-                for device in devices:
-                    if newDevice.ip == device.ip:
-                        shouldSave = False
-                if(shouldSave):
-                    newDevice.save()
-
+            # for i in range(len(macAddresses)):
+            #     newDevice = IotDevice(name="blank name",ip=ipAddresses[i])
+            #     shouldSave = True
+            #     for device in devices:
+            #         if newDevice.ip == device.ip:
+            #             shouldSave = False
+            #     if(shouldSave):
+            #         newDevice.save()
 
             # devices.delete()
             # for macAddress in macAddresses:
             #     newDevice = IotDevice(name="blank name",mac=macAddress,ip="blank ip")
             #     newDevice.save()
-                    
-            ## if we want t
                     
         elif response.POST.get("removeDevice"):
             print("removeDevice")

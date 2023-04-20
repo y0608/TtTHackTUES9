@@ -22,7 +22,7 @@
             {% csrf_token %}
             {% for device in devices %}
                 <!-- <li>{{device.name}}</li> -->
-                <h2><a href="/{{device.id}}">{{device.mac}}</a> <button type="submit" class="btn btn-danger btn-sm", name="removeDevice", value="{{device.id}}">Delete</button></h2>
+                <h2><a href="/{{device.id}}">{{device.ip}}</a> <button type="submit" class="btn btn-danger btn-sm", name="removeDevice", value="{{device.id}}">Delete</button></h2>
             {% endfor %}
         </form>
     </ul>
