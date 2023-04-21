@@ -17,6 +17,7 @@ class Whitelist(models.Model):
     src_port = models.CharField(max_length=100)
     dst_port = models.CharField(max_length=100)
     protocol = models.CharField(max_length=100)
+    size = models.IntegerField()
 
     def __str__(self):
         return self.dst_ip
@@ -28,6 +29,7 @@ class Blacklist(models.Model):
     src_port = models.CharField(max_length=100)
     dst_port = models.CharField(max_length=100)
     protocol = models.CharField(max_length=100)
+    size = models.IntegerField()
 
     def __str__(self):
         return self.dst_ip
