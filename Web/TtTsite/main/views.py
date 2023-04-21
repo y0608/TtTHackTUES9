@@ -63,13 +63,13 @@ def index(response,id):
             txt = response.POST.get("new")   
             listip = [] 
             if is_valid_ip(txt):
-                device.whitelist_set.create(dst_ip=txt,size=0)
+                device.blacklist_set.create(dst_ip=txt,size=0)
             else:
                 try:
                     listIps = get_ips(txt)
                     if(listIps != []):
                         for ip in listIps:
-                            device.whitelist_set.create(dst_ip=ip,size=0)
+                            device.blacklist_set.create(dst_ip=ip,size=0)
                     else:
                         print("invalid")
                 except:
