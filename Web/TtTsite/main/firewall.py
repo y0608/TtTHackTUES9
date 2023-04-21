@@ -3,8 +3,9 @@
 import os
 import iptc
 import pyshark
-from Web.TtTsite.main.find_devices import get_devices
-from .models import IotDevice, Whitelist, Blacklist
+# from find_devices import get_devices
+# from .models import IotDevice, Whitelist, Blacklist
+import sqlite3
 
 class Packet_t:
     def __init__(self, src_ip, dst_ip, src_port, dst_port, protocol):
@@ -65,7 +66,7 @@ def block_ip(ip_address, destination_ip):
     rule = iptc.Rule()
     rule.src = ip_address
     rule.dst = destination_ip
-    rule.target = iptc.Target(rule, "REJECT")
+    rule.target = iptc.Target(rule, "DROP")
     
     existing_rules = chain.rules
     for existing_rule in existing_rules:
@@ -80,7 +81,7 @@ def unblock_ip(ip_address, destination_ip):
     rule = iptc.Rule()
     rule.src = ip_address
     rule.dst = destination_ip
-    rule.target = iptc.Target(rule, "REJECT")
+    rule.target = iptc.Target(rule, "DROP")
 
     existing_rules = chain.rules
     for existing_rule in existing_rules:
@@ -108,23 +109,36 @@ def sniff_traffic():
                 # Block traffic from the device
                 # TODO: block packet.ipv6.dest if the device has an ipv6 address
                 # block_ip(packet.ip.dst, packet.ip.src)
-            if not devices[packet.ip.dst].has_in_wl_dst_port(packet.port.src):
+        if "IP" in packet and packet.ip.src in devices.keys():
+            if not devices[packet.ip.src].has_in_wl_dst_ip(packet.ip.dst):
                 if _DEBUG_:
                     print("Source: " + packet.ip.src + " -> " + packet.ip.dst) 
                 
                 if _DEBUG_:
-                    print(f"Blocking traffic to port: {packet.port.src}")
+                    print(f"Blocking traffic to ip: {packet.ip.dst}")
                 
+                # Block traffic from the device
+                # TODO: block packet.ipv6.dest if the device has an ipv6 address
+                # block_ip(packet.ip.src, packet.ip.dst)
+            # if not devices[packet.ip.dst].has_in_wl_dst_port(packet.port.src):
+            #     if _DEBUG_:
+            #         print("Source: " + packet.ip.src + " -> " + packet.ip.dst) 
+                
+            #     if _DEBUG_:
+            #         print(f"Blocking traffic to port: {packet.port.src}")
+                
+
+
                 # Block traffic from the device
                 # TODO: block packet.ipv6.dest if the device has an ipv6 address
                 # block_ip(packet.ip.dst, packet.ip.src)
 
-            if not devices[packet.ip.dst].has_in_wl_dst_port(packet.port.src):
-                if _DEBUG_:
-                    print("Source: " + packet.ip.src + " -> " + packet.ip.dst) 
+            # if not devices[packet.ip.dst].has_in_wl_dst_port(packet.port.src):
+            #     if _DEBUG_:
+            #         print("Source: " + packet.ip.src + " -> " + packet.ip.dst) 
                 
-                if _DEBUG_:
-                    print(f"Blocking traffic to port: {packet.port.src}")
+            #     if _DEBUG_:
+            #         print(f"Blocking traffic to port: {packet.port.src}")
                 
                 # Block traffic from the device
                 # TODO: block packet.ipv6.dest if the device has an ipv6 address
@@ -140,18 +154,38 @@ def sniff_traffic():
                 
             # Block traffic from the device
             # TODO: block packet.ipv6.dest if the device has an ipv6 address
-            # block_ip(packet.ip.dst, packet.ip.src)
+            # block_ip(packet.ipv6.dst, packet.ipv6.src)
+
+
+def stringToPacket(str):
+    packets=[]
+    for s in str:
+        packets.append(Packet_t(s[1],s[2],s[3],s[4],s[5],s[6]))
+    return packets
 
 if __name__ == "__main__":
     # get devices
-    devices = {}
-    dbIot = IotDevice.objects.all()
+    # connection = sqlite3.connect('/home/indiana/TtTAnakin/TtTHackTUES9/Web/TtTsite/db.sqlite3')
+    # connection = sqlite3.connect('/home/yoan/Documents/Programming/Projects/TtTHackTUES9/Web/TtTsite/db.sqlite3')
 
-    for device in dbIot:
-        myDevice = Device_t(Whitelist.objects.filter(device=device.id),
-                            Blacklist.objects.filter(device=device.id),
-                            device.name)
-        devices[device.ip] = myDevice
-    # sniff the traffic
-
+    # connection = sqlite3.connect('db.sqlite3')
+    connection = sqlite3.connect('/home/yoan/Documents/Programming/Projects/TtTHackTUES9/Web/TtTsite/db.sqlite3')
+    
+    sql_select_Query = "select * from main_iotdevice"
+    cursor = connection.cursor()
+    cursor.execute(sql_select_Query)
+    devicesFetch = cursor.fetchall()
+    for d in devicesFetch:
+        sql_select_Query="select * from main_whitelist where ? = main_whitelist.device_id"
+        cursor = connection.cursor()
+        cursor.execute(sql_select_Query,(d[2],))
+        white_list = cursor.fetchall()
+        sql_select_Query="select * from main_blacklist where ? = main_blacklist.device_id"
+        cursor = connection.cursor()
+        cursor.execute(sql_select_Query,(d[2],))
+        black_list = cursor.fetchall()
+        devices[d[2]] = Device_t(stringToPacket(white_list), stringToPacket(black_list), d[1])
+    connection.close()
+    
     sniff_traffic()
+    # block_ip("192.168.1.21", "192.168.1.22")
